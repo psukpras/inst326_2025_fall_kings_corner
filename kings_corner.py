@@ -220,7 +220,7 @@ def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
             print (f'{move_from} changed : {piles[move_from]}')
             return f'Moved stack pile from {move_from} onto {move_to}'
             
-
+'''
 # Fake data for testing
 hand = [
     ('A', 'R'), (2, 'R'), ('K', 'B'), 
@@ -248,6 +248,95 @@ print(valid_moves(hand, None, piles, move_from = 'N', move_to = 'E'))
 print(valid_moves(hand, None, piles, move_from = 'N', move_to = 'NE'))
 print(valid_moves(hand, None, piles, move_from = 'E', move_to = 'NE'))
 print(valid_moves(hand, None, piles, move_from = 'E', move_to = 'T'))
+'''
+
+""" Edit by Phakjira (Dec.6, 2025) """
+import random
+
+class Deck:
+    ''' A deck of 52 cards used in the Kings Corner game.
+    
+    Cards are represented as (rank, color) tuples. Each rank appears four times: 
+    twice in Red and twice in Black. 
+   
+    Attributes:
+        cards (list of tuple): the current ordered list of cards in the deck. 
+            Each card is a (rank, color) tuple such as ('Q', 'Red').
+    '''
+    
+    RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
+    COLORS = ["Red", "Black"]  
+
+    def __init__(self):
+        '''Initialize a shuffled deck.
+        
+        Side effects:
+            Creates and populates the attribute 'cards'.
+        '''
+        # Create 4 cards per rank: 2 Red + 2 Black
+        self.cards = []
+        for rank in self.RANKS:
+            for color in self.COLORS:
+                # Duplicate to simulate 52 cards
+                self.cards.append((rank, color))
+                self.cards.append((rank, color))  
+
+        random.shuffle(self.cards)
+
+    def deal(self):
+        '''Deal 7 cards from top of deck to the player. 
+        
+        Returns: 
+            list of tuples: the list of those 7 cards.
+        
+        Side effects:
+            Removes 7 cards from the beginning of 'self.cards'.
+        '''
+        hand = self.cards[:7]
+        self.cards = self.cards[7:]
+        return hand
+    
+    def draw_one(self):
+        '''Draw 1 card from the deck. 
+        
+        Returns:
+            tuple: the top card of the deck. Ex. ('K', 'Black').
+            
+        Side effects:
+            Removes 1 card from the beginning of 'self.cards'.
+        '''
+        return self.cards.pop(0)
+    
+    def turn_up_four(self):
+        '''Draw 4 cards from the deck and place them in a cross (N, S, E, W).
+        
+            - Note: These are the foundation piles.
+        
+        Returns:
+            foundation (dict): a dictionary with keys 'N', 'S', 'E', 'W' and 
+            their drawn cards.
+            
+        Side effects:
+            Removes 4 cards from the beginning of 'self.cards'.
+        '''
+        foundations = {
+            "N": self.draw_one(),
+            "S": self.draw_one(),
+            "E": self.draw_one(),
+            "W": self.draw_one(),
+        }
+        return foundations
+
+    def __str__(self):
+        '''Return an informal string of cards (Human-readable formate).'''
+        return str(self.cards)
+# Testing
+deck = Deck()
+print('List of 52 cards:\n')
+print(deck)
+print(f"\nList of 7 cards:\n\n {deck.deal()}")
+print(f"\nFoundation cards:\n\n {deck.turn_up_four()}")
+print(f"\nCards left in deck: {len(deck.cards)}\n")
 
 """Edit by Charlie"""
 
