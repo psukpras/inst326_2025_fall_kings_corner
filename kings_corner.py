@@ -1,8 +1,41 @@
 """ Exercise: Collaborative programming. """
 
 """Edit by Michael"""
+class Player:
+    """Abstract base class for a hangman player.
+    
+    Attributes:
+        name (str): the player's name.
+    """
+    def __init__(self, name):
+        self.name = name
+    
+    def turn(self, state):
+        raise NotImplementedError
+class HumanPlayer(Player):
+    
+    def __init__(self, name):
+    
+        super().__init__(name)
+        
+    def turn(self, state):
+        
+        print(state)
+        user = input(f"{self.name}, place a card from your hand")
+        return user
+        
+class ComputerPlayer(Player):
+    def __init__(self, name):
+       
+   
+        self.name = name
+    
+    def turn(self, state):
+        pass
+
 def player_turn(player_hand, play_piles, draw_pile):
-    """Process a complete turn for a player in King's Corner.
+    """
+    Process a complete turn for a player in King's Corner.
     
     Args:
         player_hand: List of cards in player's hand
