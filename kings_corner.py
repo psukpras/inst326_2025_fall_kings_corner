@@ -69,16 +69,86 @@ class Player:
         return f"{self.name}: {len(self.hand)} cards, Score: {self.score}"    
 
 class HumanPlayer(Player):
+    """Human player controlled by user input."""
     
     def __init__(self, name):
-    
+        """Initialize a human player.
+        
+        Args:
+            name(str): The player's name
+        
+        Side effects:
+            Calls parent class __init__ to set up player attributes.
+        """
         super().__init__(name)
         
     def turn(self, state):
         
-        print(state)
-        user = input(f"{self.name}, place a card from your hand")
-        return user
+        print(f"\n=== {self.name}'s Turn ===")
+        print(f"Your hand: {self.hand}")
+        print(f"Current board state: {state}")
+        
+        while True:
+            print("\nAvailable actions:")
+            print("1. Play a card")
+            print("2. Move a pile")
+            print("3. Draw a card")
+            print("4. End turn")
+            
+            try:
+                choice = int(input("Choose an action (1-4): "))
+                if 1 <= choice <= 4:
+                    break
+                else:
+                    print("Please enter a number between 1 and 4.")
+            except ValueError:
+                print("Please enter a valid number")
+                
+            if choice == 1:
+                return self.play_card(state)
+            elif choice == 2:
+                return self.move_pile(state)
+            elif choice == 3:
+                return "draw"
+            else:
+                return "end"
+    
+    def play_card(self, state):
+        if not self.hand:
+            print("No cards in hand to play!")
+            return "no_play"
+        print("Your hand:", self.hand)
+        print("Available piles:", list(state.get('piles', {}).keys()))
+        try:
+            card_index = int(input("Enter index of card to play (0-based): "))
+            if 0 <= card_index < len(self.hand):
+                card_to_play = self.hand[card_index]
+            else:
+                print("Invalid card index!")
+                return "invalid"
+            
+            move_to = input("Enter destination pile (e.g., 'N', 'NE'): ").upper()
+            
+            result = valid_moves(
+                self.hand,
+                card_to_play,
+                state.get('piles', {}),
+                move_to = move_to
+            )
+            
+            if "Invalid" in result:
+                print(result)
+                return "invalid"
+            else:
+                print(result)
+                return "played_card"
+        except (ValueError, IndexError):
+            print("Invalid input!")
+            return "invalid"
+        
+    def move_pile( self, state):
+        piles = state.get('piles', {})
+        print("Available piles:", list(piles.keys()))
         
 class ComputerPlayer(Player):
     def __init__(self, name):
@@ -88,56 +158,6 @@ class ComputerPlayer(Player):
     
     def turn(self, state):
         pass
-
-def player_turn(player_hand, play_piles, draw_pile):
-    """
-    Process a complete turn for a player in King's Corner.
-    
-    Args:
-        player_hand: List of cards in player's hand
-        play_piles: Dictionary of play piles {'A': [], 'B': [], 'C': [], 'D': [], 'K1': [], 'K2': [], 'K3': [], 'K4': []}
-        draw_pile: List representing the draw pile
-    
-    Returns:
-        tuple: (player_hand, play_piles, draw_pile, turn_completed)
-    """
-    turn_completed = False
-    if not turn_completed:
-        move_type = get_player_move_choice()
-        if move_type == "play_card":
-            turn_completed = try_play_card(player_hand, play_piles)
-        elif move_type == "move_pile":
-            turn_completed = try_move_pile(play_piles)
-        elif move_type == "draw_card" and draw_pile:
-            player_hand.append(draw_pile.pop())
-            turn_completed = True
-        elif move_type == "end_turn":
-            turn_completed = True
-    # If still no move completed and draw pile exists, draw a card
-    if not turn_completed and draw_pile:
-        player_hand.append(draw_pile.pop())
-        turn_completed = True
-    return player_hand, play_piles, draw_pile, turn_completed
-
-# Mock functions that would be implemented by other group members
-def get_player_move_choice():
-    """Mock function to get player's move choice"""
-    # In final implementation, this would get real user input
-    choices = ["play_card", "move_pile", "draw_card", "end_turn"]
-    # Simulating player choosing to play a card
-    return "play_card"
-
-def try_play_card(player_hand, play_piles):
-    """Mock function to attempt playing a card from hand to a pile"""
-    return True
-
-def try_move_pile(play_piles):
-    """Mock function to attempt moving one pile onto another"""
-    # In final implementation, this would validate pile movement rules
-    # For now, just simulate a successful move
-    print("Moved one pile onto another")
-    return True
-
 """Edit by Phakjira"""
 
 def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
