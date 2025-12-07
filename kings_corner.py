@@ -4,17 +4,70 @@
 """
 
 """Edit by Michael"""
+import random
 class Player:
-    """Abstract base class for a hangman player.
+    """Base class for a King's Corner player.
     
     Attributes:
-        name (str): the player's name.
+        name (str): The player's name.
+        hand (list): List of cards in player's hand as (rank, color) tuples.
+        score (int): The player's current score.
     """
     def __init__(self, name):
+        """Initialize a new player.
+        
+        Args:
+            name (str): The player's name.
+        
+        Side effects:
+            Initializes hand as empty list and score as 0.
+        """
         self.name = name
+        self.hand = []
+        self.score = 0
     
     def turn(self, state):
         raise NotImplementedError
+    
+    def draw_card(self, draw_pile):
+        """Draw a card from the draw pile.
+        
+        Args:
+            draw_pile (list): List of cards representing the draw pile.
+            
+        Returns:
+            bool: True if card was drawn successfully, False if draw pile is empty.
+            
+        Side effects:
+            Adds a card to player's hand and removes it from draw pile.
+            Prints draw action to console.
+        """
+        if draw_pile:
+            card = draw_pile.pop()
+            self.hand.append(card)
+            print(f"{self.name} draws a card")
+            return True
+        return False
+    
+    def add_score(self, points):
+        """Add points to player's score.
+        
+        Args:
+            points (int): Points to add to player's score.
+            
+        Side effects:
+            Increases player's score by given points.
+        """
+        self.score += points
+        
+    def __str__(self):
+        """Create string representation of player.
+        
+        Returns:
+            str: Formatted string with player name, card count, and score.
+        """
+        return f"{self.name}: {len(self.hand)} cards, Score: {self.score}"    
+
 class HumanPlayer(Player):
     
     def __init__(self, name):
