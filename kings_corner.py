@@ -1,4 +1,7 @@
-""" Exercise: Collaborative programming. """
+""" Exercise: Collaborative programming. 
+# We'll need classes to put these functions in and maybe a Player() class and a Board() class as well.
+# 
+"""
 
 """Edit by Michael"""
 def player_turn(player_hand, play_piles, draw_pile):
