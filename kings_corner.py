@@ -2,9 +2,9 @@
 # We'll need classes to put these functions in and maybe a Player() class and a Board() class as well.
 # 
 """
+import random 
 
 """Edit by Michael"""
-import random
 class Player:
     """Base class for a King's Corner player.
     
@@ -177,7 +177,7 @@ def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
         (e.g., 'N', 'S') and each value is a list of cards in that pile.
         move_from (str, optional): name of the pile the player wants to move 
             a card or a stack from. Defaults to None.
-        move_to (str, optional): name of the pile the player wants to move 
+        move_to (str): name of the pile the player wants to move 
             a card or a stack to. Defaults to None.
             
     Returns:
@@ -329,7 +329,7 @@ def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
             print (f'{move_from} changed : {piles[move_from]}')
             return f'Moved stack pile from {move_from} onto {move_to}'
             
-'''
+
 # Fake data for testing
 hand = [
     ('A', 'R'), (2, 'R'), ('K', 'B'), 
@@ -357,10 +357,9 @@ print(valid_moves(hand, None, piles, move_from = 'N', move_to = 'E'))
 print(valid_moves(hand, None, piles, move_from = 'N', move_to = 'NE'))
 print(valid_moves(hand, None, piles, move_from = 'E', move_to = 'NE'))
 print(valid_moves(hand, None, piles, move_from = 'E', move_to = 'T'))
-'''
+
 
 """ Edit by Phakjira (Dec.6, 2025) """
-import random
 
 class Deck:
     ''' A deck of 52 cards used in the Kings Corner game.
@@ -436,16 +435,20 @@ class Deck:
         }
         return foundations
 
+    def __len__(self):
+        '''Return the number of cards currently in the deck.'''
+        return len(self.cards)
+    
     def __str__(self):
         '''Return an informal string of cards (Human-readable formate).'''
         return str(self.cards)
 # Testing
 deck = Deck()
-print('List of 52 cards:\n')
-print(deck)
+print('\nList of 52 cards:\n')
+print(deck.cards)
 print(f"\nList of 7 cards:\n\n {deck.deal()}")
 print(f"\nFoundation cards:\n\n {deck.turn_up_four()}")
-print(f"\nCards left in deck: {len(deck.cards)}\n")
+print(f"\nCards left in deck: {len(deck)}\n")
 
 """Edit by Charlie"""
 
@@ -503,4 +506,3 @@ board = build_board(3, 3)
 
 for row in board:
     print(" ".join(row))
-
