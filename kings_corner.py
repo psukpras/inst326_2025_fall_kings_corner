@@ -104,14 +104,14 @@ class HumanPlayer(Player):
             except ValueError:
                 print("Please enter a valid number")
                 
-            if choice == 1:
-                return self.play_card(state)
-            elif choice == 2:
-                return self.move_pile(state)
-            elif choice == 3:
-                return "draw"
-            else:
-                return "end"
+        if choice == 1:
+            return self.play_card(state)
+        elif choice == 2:
+            return self.move_pile(state)
+        elif choice == 3:
+            return "draw"
+        else:
+            return "end"
     
     def play_card(self, state):
         if not self.hand:
@@ -149,15 +149,130 @@ class HumanPlayer(Player):
     def move_pile( self, state):
         piles = state.get('piles', {})
         print("Available piles:", list(piles.keys()))
+        try:
+            move_from = input("Enter source pile to move from: ").upper()
+            move_to = input("Enter destination pile to move to: ").upper()
+            
+            result = valid_moves(
+                self.hand,
+                None,  # No card from hand
+                piles,
+                move_from=move_from,
+                move_to=move_to
+            )
+            
+            if "Invalid" in result:
+                print(result)
+                return "invalid"
+            else:
+                print(result)
+                return "moved_pile"
+                
+        except (ValueError, KeyError):
+            print("Invalid input!")
+            return "invalid"
         
 class ComputerPlayer(Player):
     def __init__(self, name):
-       
-   
-        self.name = name
+        super().__init__(name)
     
     def turn(self, state):
-        pass
+        print(f"\n=== {self.name}'s Turn (Computer) ===")
+        piles = state.get('piles', {})
+        draw_pile = state.get('draw_pile', [])
+        # Strategy 1: Try to play a King to an empty corner pile
+        for card in self.hand:
+            if card[0] == 'K':
+                corner_piles = ['NW', 'NE', 'SW', 'SE']
+                for corner in corner_piles:
+                    if not piles.get(corner, []):
+                        print(f"{self.name} tries to play {card} to {corner}")
+                        result = valid_moves(self.hand, card, piles, move_to = corner)
+                        if "Invalid" not in result:
+                            print(result)
+                            return "played_card"
+         # Strategy 2: Try to play any card to side piles
+        for card in self.hand:
+            side_piles = ['N', 'S', 'E', 'W']
+            for side in side_piles:
+                print(f"{self.name} tries to play {card} to {side}")
+                result = valid_moves(self.hand, card, piles, move_to=side)
+                if "Invalid" not in result:
+                    print(result)
+                    return "played_card"
+        # Strategy 3: Try to move a pile
+        for from_pile in ['N', 'S', 'E', 'W']:
+            for to_pile in ['N', 'S', 'E', 'W']:
+                if from_pile != to_pile and piles.get(from_pile):
+                    print(f"{self.name} tries to move pile from {from_pile} to {to_pile}")
+                    result = valid_moves(
+                        self.hand,
+                        None,
+                        piles,
+                        move_from=from_pile,
+                        move_to=to_pile
+                    )
+                    if "Invalid" not in result:
+                        print(result)
+                        return "moved_pile"
+        # Strategy 4: Draw a card if possible
+        if draw_pile:
+            print(f"{self.name} chooses to draw a card.")
+            return "draw"
+        # Strategy 5: End turn
+        print(f"{self.name} chooses to end turn.")
+        return "end"
+
+def player_turn(player_hand, play_piles, draw_pile, player):
+    """
+    Process a complete turn for a player in King's Corner.
+    
+    Args:
+        player_hand: List of cards in player's hand
+        play_piles: Dictionary of play piles {'N', 'S', 'E', 'W', 'NW', 'NE', 'SW', 'SE'}
+        draw_pile: List representing the draw pile
+        player: Player object taking the turn (HumanPlayer or ComputerPlayer)
+    
+    Returns:
+        tuple: (player_hand, play_piles, draw_pile, turn_completed)
+    
+    Side effects:
+        - May print prompts and messages to console
+        - Modifies player_hand, play_piles, and draw_pile
+    """
+    turn_completed = False
+    state = {
+        'piles': play_piles,
+        'draw_pile': draw_pile
+    }
+    action = player.turn(state)
+    if action == "draw":
+        if draw_pile:
+            player_hand.append(draw_pile.pop())
+            print(f"{player.name} draws a card.")
+            turn_completed = True
+        else:
+            print("Draw pile is empty!")
+    elif action == "end":
+        print(f"{player.name} ends turn.")
+        turn_completed = True
+    elif action in ["played_card", "moved_pile"]:
+        turn_completed = True
+    elif action in ["invalid", "no_play"]:
+        if draw_pile:
+            player_hand.append(draw_pile.pop())
+            print(f"{player.name} draws a card.")
+            turn_completed = True
+        else:
+            print("No valid moves and draw pile is empty.")
+            turn_completed = True
+    if not turn_completed and draw_pile:
+        player_hand.append(draw_pile.pop())
+        print(f"{player.name} draws a card (no other moves available).")
+        turn_completed = True
+    
+    return player_hand, play_piles, draw_pile, turn_completed
+
 """Edit by Phakjira"""
 
 def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
@@ -434,6 +549,7 @@ class Deck:
             "W": self.draw_one(),
         }
         return foundations
+    
 
     def __len__(self):
         '''Return the number of cards currently in the deck.'''
@@ -449,6 +565,7 @@ print(deck.cards)
 print(f"\nList of 7 cards:\n\n {deck.deal()}")
 print(f"\nFoundation cards:\n\n {deck.turn_up_four()}")
 print(f"\nCards left in deck: {len(deck)}\n")
+
 
 """Edit by Charlie"""
 
@@ -488,7 +605,7 @@ print(f"p2 score:{p2_score}")
 win_condition(p1_score, p2_score) #no winner since only one round was played
 
 """Edit by Attowla"""
-def build_board(rows, cols):
+def build_board():
     """
     Laying out the initial board.
 
@@ -499,10 +616,30 @@ def build_board(rows, cols):
     Returns:
         _type_: _description_
     """
-    board = [["example card" for _ in range(cols)] for _ in range(rows)]
-    return board
+    
+    global_foundations = deck.turn_up_four()
+    #Group all the top cards together (define them)
+    #Then make a 3x3 board off of those variables
+    #[2][2] will be blank
+    NW_corner = "\u2022"
+    N_corner = str(global_foundations["N"])
+    NE_corner = "\u2022"
+    W_corner = str(global_foundations["W"])
+    Center = "\u2022"
+    E_corner = str(global_foundations["E"])
+    SW_corner = "\u2022"
+    S_corner = str(global_foundations["S"])
+    SE_corner = "\u2022"
+    
+    game_board = [
+        [NW_corner, N_corner, NE_corner],
+        [W_corner, Center, E_corner],
+        [SW_corner, S_corner, SE_corner]
+    ]
+    board = [[("\u2022") for _ in range(3)] for _ in range(3)]
+    return game_board
 
-board = build_board(3, 3)
+board = build_board()
 
 for row in board:
     print(" ".join(row))
