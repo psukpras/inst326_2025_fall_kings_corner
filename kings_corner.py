@@ -545,12 +545,13 @@ class Deck:
         Side effects:
             Removes 4 cards from the beginning of 'self.cards'.
         '''
-        return {
-            "N": [self.draw_one()],
-            "S": [self.draw_one()],
-            "E": [self.draw_one()],
-            "W": [self.draw_one()],
+        foundations = {
+        "N": self.draw_one(),  # Returns card directly, not in list
+        "S": self.draw_one(),
+        "E": self.draw_one(),
+        "W": self.draw_one(),
         }
+        return foundations
     
 
     def __len__(self):
