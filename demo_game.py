@@ -7,6 +7,10 @@ computer = ComputerPlayer("CPU")
 human.hand = deck.deal()
 computer.hand = deck.deal()
 piles = deck.turn_up_four()
+foundation_cards = deck.turn_up_four()
+piles = {}
+for position, card in foundation_cards.items():
+    piles[position] = [card]
 for corner in ['NW', 'NE', 'SW', 'SE']:
     piles[corner] = []
 
