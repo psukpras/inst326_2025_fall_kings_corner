@@ -374,6 +374,7 @@ print(f"\nList of 7 cards:\n\n {deck.deal()}")
 print(f"\nFoundation cards:\n\n {deck.turn_up_four()}")
 print(f"\nCards left in deck: {len(deck.cards)}\n")
 
+
 """Edit by Charlie"""
 
 def end_round(playerturnhand):
@@ -412,7 +413,7 @@ print(f"p2 score:{p2_score}")
 win_condition(p1_score, p2_score) #no winner since only one round was played
 
 """Edit by Attowla"""
-def build_board(rows, cols):
+def build_board():
     """
     Laying out the initial board.
 
@@ -423,10 +424,14 @@ def build_board(rows, cols):
     Returns:
         _type_: _description_
     """
-    board = [["example card" for _ in range(cols)] for _ in range(rows)]
+    #Group all the top cards together (define them)
+    #Then make a 3x3 board off of those variables
+    #[2][2] will be blank
+    
+    board = [[("\u2022") for _ in range(3)] for _ in range(3)]
     return board
 
-board = build_board(3, 3)
+board = build_board()
 
 for row in board:
     print(" ".join(row))
