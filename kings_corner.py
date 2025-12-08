@@ -5,9 +5,6 @@
 import random 
 
 """Edit by Michael"""
-from argparse import ArgumentParser
-import random
-import sys
 class Player:
     """Base class for a King's Corner player.
     
@@ -50,7 +47,6 @@ class Player:
             self.hand.append(card)
             print(f"{self.name} draws a card")
             return True
-        print("draw pile is empty")
         return False
     
     def add_score(self, points):
@@ -63,10 +59,7 @@ class Player:
             Increases player's score by given points.
         """
         self.score += points
-    
-    def turn(self, state):
-        raise NotImplementedError
-    
+        
     def __str__(self):
         """Create string representation of player.
         
@@ -148,7 +141,7 @@ class HumanPlayer(Player):
                 return "invalid"
             else:
                 print(result)
-                return "played_card"
+                return ("played_card", card_to_play)
         except (ValueError, IndexError):
             print("Invalid input!")
             return "invalid"
@@ -173,7 +166,7 @@ class HumanPlayer(Player):
                 return "invalid"
             else:
                 print(result)
-                return "moved_pile"
+                return ("moved_pile", move_to)
                 
         except (ValueError, KeyError):
             print("Invalid input!")
@@ -263,7 +256,9 @@ def player_turn(player_hand, play_piles, draw_pile, player):
     elif action == "end":
         print(f"{player.name} ends turn.")
         turn_completed = True
-    elif action in ["played_card", "moved_pile"]:
+    elif isinstance(action, tuple) and action[0] == "played_card":
+        turn_completed = True
+    elif isinstance(action, tuple) and action[0] == "moved_pile":
         turn_completed = True
     elif action in ["invalid", "no_play"]:
         if draw_pile:
@@ -311,7 +306,8 @@ def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
         _ Modifies the 'piles' dictionary when a card or stack is moved.
     '''
     # Rank order from high to low
-    rank_order = ['K', 'Q', 'J', 10, 9, 8, 7, 6, 5, 4, 3, 2, 'A']
+    rank_order = ['K', 'Q', 'J', '10', '9', '8', '7', '6', 
+                  '5', '4', '3', '2', 'A']
     corner_piles = ['NW', 'NE', 'SW', 'SE']
     side_piles = ['N', 'S', 'E', 'W']
 
@@ -470,7 +466,7 @@ piles = {
     'SW' : []
 }            
 
-print(valid_moves(hand, (4, 'R'), piles))
+'''print(valid_moves(hand, (4, 'R'), piles))
 print(valid_moves(hand, (4, 'R'), piles, move_to = 'N'))
 print(valid_moves(hand, (2, 'B'), piles, move_to = 'S'))
 print(valid_moves(hand, ('A', 'R'), piles, move_to = 'B'))
@@ -478,7 +474,7 @@ print(valid_moves(hand, ('A', 'R'), piles, move_to = 'N'))
 print(valid_moves(hand, None, piles, move_from = 'N', move_to = 'E'))
 print(valid_moves(hand, None, piles, move_from = 'N', move_to = 'NE'))
 print(valid_moves(hand, None, piles, move_from = 'E', move_to = 'NE'))
-print(valid_moves(hand, None, piles, move_from = 'E', move_to = 'T'))
+print(valid_moves(hand, None, piles, move_from = 'E', move_to = 'T'))'''
 
 
 """ Edit by Phakjira (Dec.6, 2025) """
@@ -549,13 +545,12 @@ class Deck:
         Side effects:
             Removes 4 cards from the beginning of 'self.cards'.
         '''
-        foundations = {
-            "N": self.draw_one(),
-            "S": self.draw_one(),
-            "E": self.draw_one(),
-            "W": self.draw_one(),
+        return {
+            "N": [self.draw_one()],
+            "S": [self.draw_one()],
+            "E": [self.draw_one()],
+            "W": [self.draw_one()],
         }
-        return foundations
     
 
     def __len__(self):
@@ -566,12 +561,12 @@ class Deck:
         '''Return an informal string of cards (Human-readable formate).'''
         return str(self.cards)
 # Testing
-#deck = Deck()
-#print('\nList of 52 cards:\n')
-#print(deck.cards)
-#print(f"\nList of 7 cards:\n\n {deck.deal()}")
-#print(f"\nFoundation cards:\n\n {deck.turn_up_four()}")
-#print(f"\nCards left in deck: {len(deck)}\n")
+deck = Deck()
+print('\nList of 52 cards:\n')
+print(deck.cards)
+print(f"\nList of 7 cards:\n\n {deck.deal()}")
+print(f"\nFoundation cards:\n\n {deck.turn_up_four()}")
+print(f"\nCards left in deck: {len(deck)}\n")
 
 
 """Edit by Charlie"""
@@ -612,7 +607,7 @@ print(f"p2 score:{p2_score}")
 win_condition(p1_score, p2_score) #no winner since only one round was played
 
 """Edit by Attowla"""
-def build_board(deck):
+def build_board():
     """
     Laying out the initial board.
 
@@ -643,97 +638,10 @@ def build_board(deck):
         [W_corner, Center, E_corner],
         [SW_corner, S_corner, SE_corner]
     ]
+    board = [[("\u2022") for _ in range(3)] for _ in range(3)]
     return game_board
-deck = Deck()
-board = build_board(deck)
+
+board = build_board()
 
 for row in board:
     print(" ".join(row))
-
-def main(player_names, use_computer):
-    """
-    Set up and run a game of King's Corner.
-
-    Args:
-        player_names (list[str]): human player names
-        use_computer (bool): whether to add a computer opponent
-    """
-
-    players = [HumanPlayer(name) for name in player_names]
-
-    if use_computer:
-        players.append(ComputerPlayer("Computer"))
-
-    print("\n=== Starting King’s Corner ===")
-    print("Players:", ", ".join(p.name for p in players))
-
-    deck = Deck()
-
-    for p in players:
-        p.hand = deck.deal()
-        print(f"{p.name} begins with: {p.hand}")
-
-    foundations = deck.turn_up_four()
-    piles = {
-        "N": [foundations["N"]],
-        "S": [foundations["S"]],
-        "E": [foundations["E"]],
-        "W": [foundations["W"]],
-        "NW": [],
-        "NE": [],
-        "SW": [],
-        "SE": []
-    }
-
-    print("\nInitial board piles:")
-    for k, v in piles.items():
-        print(f"{k}: {v}")
-
-    draw_pile = deck.cards
-
-    current = 0
-    while True:
-        player = players[current]
-        print(f"\n----- {player.name}'s turn -----")
-
-        player.hand, piles, draw_pile, finished = player_turn(
-            player.hand,
-            piles,
-            draw_pile,
-            player
-        )
-
-        if len(player.hand) == 0:
-            print(f"\n {player.name} wins the round! ")
-            break
-
-        # Switch players
-        current = (current + 1) % len(players)
-
-    
-def parse_args(arglist):
-    """ Parse command-line arguments.
-    
-    Expect two mandatory arguments:
-        - wordlist: a path to a file containing one word per line
-        - names: one or more names of human players
-    
-    Also allow two optional arguments:
-        -c, --computer_player: if specified, include a computer player.
-    
-    Args:
-        arglist (list of str): arguments from the command line.
-    
-    Returns:
-        namespace: the parsed arguments, as a namespace.
-    """
-    parser = ArgumentParser()
-    parser.add_argument("names", nargs="*", help="player names(0-2)")
-    parser.add_argument("-c", "--computer_player", action="store_true",
-                        help="add a computer player")
-    return parser.parse_args(arglist)
-
-
-if __name__ == "__main__":
-    args = parse_args(sys.argv[1:])
-    main(args.names, args.computer_player)
