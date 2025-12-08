@@ -362,6 +362,7 @@ class Deck:
             "W": self.draw_one(),
         }
         return foundations
+    
 
     def __str__(self):
         '''Return an informal string of cards (Human-readable formate).'''
@@ -424,12 +425,28 @@ def build_board():
     Returns:
         _type_: _description_
     """
+    
+    global_foundations = deck.turn_up_four()
     #Group all the top cards together (define them)
     #Then make a 3x3 board off of those variables
     #[2][2] will be blank
+    NW_corner = "\u2022"
+    N_corner = str(global_foundations["N"])
+    NE_corner = "\u2022"
+    W_corner = str(global_foundations["W"])
+    Center = "\u2022"
+    E_corner = str(global_foundations["E"])
+    SW_corner = "\u2022"
+    S_corner = str(global_foundations["S"])
+    SE_corner = "\u2022"
     
+    game_board = [
+        [NW_corner, N_corner, NE_corner],
+        [W_corner, Center, E_corner],
+        [SW_corner, S_corner, SE_corner]
+    ]
     board = [[("\u2022") for _ in range(3)] for _ in range(3)]
-    return board
+    return game_board
 
 board = build_board()
 
