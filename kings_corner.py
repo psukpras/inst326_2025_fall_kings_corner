@@ -1,8 +1,139 @@
-""" Exercise: Collaborative programming. 
-# We'll need classes to put these functions in and maybe a Player() class and a Board() class as well.
-# 
-"""
 import random 
+
+""" Edit by Phakjira (Dec.10, 2025) """
+
+class KingsGame:
+    ''' 
+    Manage and run a full game of King's Corner.
+    
+    Attributes:
+        deck (Deck): The deck of cards used for the game.
+        p1 (HumanPlayer): The human player.
+        p2 (ComputerPlayer): The computer-controlled player.
+        foundation_cards (dict): The initial four face-up piles (N, S, E, W).
+        piles (dict): Dictionary mapping pile names to lists of cards.
+        draw_pile (list): Remaining undealt cards after setup.
+
+    Side effects:
+        Prompts the user for their name.
+        Modifies the deck by dealing cards and removing foundation cards.
+        Prints game information during setup.
+    '''
+    def __init__(self):
+        '''
+        Initialize a new King's Corner game.
+        
+        Side effects:
+            Prompts the user to enter their name via input().
+            Modifies the deck by dealing cards and removing foundation cards.
+        '''
+        # Create deck
+        self.deck = Deck()
+        
+        # Ask player name
+        player_name = input("Enter your name: ").strip()
+        if player_name == "":
+            player_name = "Player 1"
+
+        # Create players
+        self.p1 = HumanPlayer(player_name)
+        self.p2 = ComputerPlayer("Computer")
+
+        # Deal hands
+        self.p1.hand = self.deck.deal()
+        self.p2.hand = self.deck.deal()
+
+        # Turn up N/S/E/W foundations 
+        self.foundation_cards = self.deck.turn_up_four()
+
+        # Convert them into piles (lists)
+        self.piles = {}
+        for position, card in self.foundation_cards.items():
+            self.piles[position] = [card]
+        for corner in ['NW', 'NE', 'SW', 'SE']:
+            self.piles[corner] = []
+        
+        # Draw pile is whatever remains in the deck
+        self.draw_pile = self.deck.cards
+        
+
+    def play_game(self):
+        '''
+        Run the main gameplay loop for King's Corner.
+        
+        Game ends when:
+            - A player empties their hand, or
+            - The draw pile becomes empty.
+
+        On ending, both players' scores are calculated using end_round(), and
+        win_condition() is used to determine and display the winner.
+        
+        Side effects:
+            Prints the board, piles, scores, and game status each turn.
+            Calls player_turn(), which may modify hands and piles.
+            Mutates self.piles, self.draw_pile, and player hands.
+            Prints final results.
+        '''
+        print("\n=== Starting King’s Corner ===\n")
+
+        players = [self.p1, self.p2]
+        turn_index = 0
+
+        while True:
+            current_player = players[turn_index % 2]
+            
+            print("===========================")
+            # Build and print updated board each turn
+            board = build_board(self.piles)
+            print("\nCurrent Board:\n")
+            for row in board:
+                print(  " ".join(row))
+            # Print updated piles each turn
+            print("\nCurrent piles:\n")
+            for pile_name, cards in self.piles.items():
+                print(f"  {pile_name}: {cards}")
+            # Remaining # card in deck
+            print(f"\nCards left in deck: {len(self.deck)}\n")
+
+            # Use your existing player_turn function
+            current_player.hand, self.piles, self.draw_pile, done = (
+                player_turn(current_player.hand, self.piles, self.draw_pile, 
+                current_player)
+            )
+
+           # Show current score after this turn
+            '''p1_score = end_round(self.p1.hand)
+            p2_score = end_round(self.p2.hand)
+            print(f"\nCurrent Scores:")
+            print(f"{self.p1.name}: {p1_score}")
+            print(f"{self.p2.name}: {p2_score}")'''
+            
+            # Check end conditions
+            end_game = False
+            reason = ""
+
+            # If Player emptied their hand
+            if len(current_player.hand) == 0:
+                end_game = True
+                reason = f"{current_player.name} emptied their hand!"
+
+            # If there's No cards left in draw pile
+            elif len(self.draw_pile) == 0:
+                end_game = True
+                reason = "No cards left in the draw pile!"
+
+            # Calculate scores and announce winner if game ends
+            if end_game:
+                print(f"\n{reason} Round over.\n")
+                p1_score = end_round(self.p1.hand)
+                p2_score = end_round(self.p2.hand)
+                print(f"{self.p1.name} score: {p1_score}")
+                print(f"{self.p2.name} score: {p2_score}\n")
+                win_condition(p1_score, p2_score)
+                break
+
+            turn_index += 1
+            
 
 """Edit by Michael"""
 class Player:
@@ -85,8 +216,8 @@ class HumanPlayer(Player):
     def turn(self, state):
         
         print(f"\n=== {self.name}'s Turn ===")
-        print(f"Your hand: {self.hand}")
-        print(f"Current board state: {state}")
+        print(f"\nYour hand: {self.hand}")
+        #print(f"Current board state: {state}")
         
         while True:
             print("\nAvailable actions:")
@@ -326,13 +457,36 @@ def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
 
         # Handle corner piles
         if move_to in corner_piles:
-            if card_to_play[0] == 'K':
+            # Handle empty pile
+            if not piles[move_to]:
+                if card_to_play[0] != 'K':
+                    return ('Invalid Move! Only Kings can start the '+
+                        'corner piles.')
                 piles[move_to].append(card_to_play)
                 hand.remove(card_to_play)
-                return f"Placed {card_to_play} on {move_to}."
-            else:
-                return('Invalid Move! Only Kings can be placed in empty '+
-            'corner piles.')
+                return f'Placed {card_to_play} on {move_to}'
+           
+            # Last card from the pile
+            top_card = piles[move_to][-1]
+            
+            # Unpacked
+            top_rank, top_color = top_card
+            play_rank, play_color = card_to_play
+            
+            # Handle descending rank rule
+            if rank_order.index(play_rank) != rank_order.index(top_rank) + 1:
+                return ('Invalid Move! The card must be a rank ' + 
+                    f'lower than {top_card}')
+            
+            # Handle alternating color rule
+            if play_color == top_color:
+                return 'Invalid Move! Alternate colors rule applies.'
+                
+            piles[move_to].append(card_to_play)
+            hand.remove(card_to_play)
+            print (f'{move_to} changed: {piles[move_to]}')
+            print (f'Current Hand changed to: {hand}')
+            return f'Placed {card_to_play} on {move_to}'
 
         # Handle side piles
         if move_to in side_piles:
@@ -385,8 +539,16 @@ def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
         if move_to in corner_piles:
             # Handle empty corner pile (move_to)
             if not piles[move_to]:
-                return "Invalid Move! Can't move a full pile onto an empty pile."
-           
+                # Just move the card to the empty corner pile if it's a K
+                if stack[0][0] == 'K':
+                    piles[move_to] += stack
+                    piles[move_from] = []
+                    print (f'{move_to} changed : {piles[move_to]}')
+                    print (f'{move_from} changed : {piles[move_from]}')
+                    return f'Moved stack pile from {move_from} onto {move_to}'
+                else:
+                    return('Invalid Move! Only Kings can be placed in empty '+
+                            'corner piles.')
             # Last card from the pile
             top_card = piles[move_to][-1]
             
@@ -589,9 +751,9 @@ def win_condition(p1_score, p2_score):
     """
     Args: p1 and p2 score is the players final score
     """
-    if p1_score >= 25:
+    if p1_score > p2_score:
         print(f"player 2 wins! score:{p2_score}")
-    elif p2_score >= 25:
+    elif p2_score > p1_score:
         print(f"player 1 wins! score:{p1_score}")
     else:
         return None
@@ -602,47 +764,56 @@ p2 = [(9, "b"), (12, "b"), (3, "r")]
 p1_score = end_round(p1)
 p2_score = end_round(p2)
 
-print(f"p1 score:{p1_score}")
-print(f"p2 score:{p2_score}")
+#print(f"p1 score:{p1_score}")
+#print(f"p2 score:{p2_score}")
 
-win_condition(p1_score, p2_score) #no winner since only one round was played
+#win_condition(p1_score, p2_score) #no winner since only one round was played
 
 """Edit by Attowla"""
-def build_board():
+def build_board(piles):
     """
-    Laying out the initial board.
+    Build a 3x3 board layout of King's Corner.
 
     Args:
-        rows (int): Amount of rows in each board
-        cols (int): Amount of columns in each board
+        piles (dict): Dictionary of all piles (side + corner).
 
     Returns:
-        _type_: _description_
+        list: 3x3 list of strings representing the board.
     """
     
-    global_foundations = deck.turn_up_four()
-    #Group all the top cards together (define them)
-    #Then make a 3x3 board off of those variables
-    #[2][2] will be blank
-    NW_corner = "\u2022"
-    N_corner = str(global_foundations["N"])
-    NE_corner = "\u2022"
-    W_corner = str(global_foundations["W"])
-    Center = "\u2022"
-    E_corner = str(global_foundations["E"])
-    SW_corner = "\u2022"
-    S_corner = str(global_foundations["S"])
-    SE_corner = "\u2022"
-    
-    game_board = [
-        [NW_corner, N_corner, NE_corner],
-        [W_corner, Center, E_corner],
-        [SW_corner, S_corner, SE_corner]
+    def top_card(pile_name):
+        """
+        Return the top card of a pile or a dot if the pile is empty.
+
+        Args:
+            pile_name (str): Name of the specific pile.
+
+        Returns:
+            str: Formatted top card string or bullet symbol.
+        """
+        pile = piles.get(pile_name, [])
+        if pile:
+            rank, color = pile[-1]
+            return f"{rank}{color[0]}"  # Example: 'KR' = King Red
+        else:
+            return "\u2022"  # Bullet for empty pile
+
+    board = [
+        [top_card('NW'), top_card('N'), top_card('NE')],
+        [top_card('W'), "\u2022", top_card('E')],
+        [top_card('SW'), top_card('S'), top_card('SE')]
     ]
-    board = [[("\u2022") for _ in range(3)] for _ in range(3)]
-    return game_board
+    return board
 
-board = build_board()
+# main()
+def main():
+    """ Run a full game of King's Corner.
+    
+    Sets up the deck, players, and board, then handles turn-by-turn
+    gameplay until a winner is determined.
+    """
+    game = KingsGame()
+    game.play_game()
 
-for row in board:
-    print(" ".join(row))
+if __name__ == "__main__":
+    main()
