@@ -724,12 +724,12 @@ class Deck:
         '''Return an informal string of cards (Human-readable formate).'''
         return str(self.cards)
 # Testing
-deck = Deck()
+'''deck = Deck()
 print('\nList of 52 cards:\n')
 print(deck.cards)
 print(f"\nList of 7 cards:\n\n {deck.deal()}")
 print(f"\nFoundation cards:\n\n {deck.turn_up_four()}")
-print(f"\nCards left in deck: {len(deck)}\n")
+print(f"\nCards left in deck: {len(deck)}\n")'''
 
 
 """Edit by Charlie"""
