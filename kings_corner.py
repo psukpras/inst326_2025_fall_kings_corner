@@ -56,7 +56,6 @@ class KingsGame:
         # Draw pile is whatever remains in the deck
         self.draw_pile = self.deck.cards
         
-    """ Edit by Michael 12.06.2025 """
     def play_game(self):
         '''
         Run the main gameplay loop for King's Corner.
