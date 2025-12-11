@@ -48,4 +48,4 @@
 | Deck._\_len__| Phakjira Sukprasert  | Magic methods other than _\_init__   |
 |Player._\_init__|
 |HumanPlayer.__init__()| Michael Huang | super() |
-|HumanPlayer.play_card() | Michael Huang | keyword arguments |
+|ComputerPlayer.turn() | Michael Huang | f-strings containing expressions |
