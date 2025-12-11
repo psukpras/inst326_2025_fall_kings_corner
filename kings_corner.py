@@ -418,6 +418,7 @@ class ComputerPlayer(Player):
         # Strategy 5: End turn
         print(f"{self.name} chooses to end turn.")
         return "end"
+
 """ Edit by Michael 12.06.2025 """
 def player_turn(player_hand, play_piles, draw_pile, player):
     """
