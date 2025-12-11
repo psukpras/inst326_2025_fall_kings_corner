@@ -204,6 +204,7 @@ class Player:
         """
         return f"{self.name}: {len(self.hand)} cards, Score: {self.score}"    
 
+""" Edit by Michael 12.06.2025 """
 class HumanPlayer(Player):
     """Human player controlled by user input."""
     
