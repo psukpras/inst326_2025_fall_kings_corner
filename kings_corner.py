@@ -56,7 +56,7 @@ class KingsGame:
         # Draw pile is whatever remains in the deck
         self.draw_pile = self.deck.cards
         
-
+    """ Edit by Michael 12.06.2025 """
     def play_game(self):
         '''
         Run the main gameplay loop for King's Corner.
@@ -95,19 +95,12 @@ class KingsGame:
             # Remaining # card in deck
             print(f"\nCards left in deck: {len(self.deck)}\n")
 
-            # Use your existing player_turn function
+            # Use existing player_turn function
             current_player.hand, self.piles, self.draw_pile, done = (
                 player_turn(current_player.hand, self.piles, self.draw_pile, 
                 current_player)
             )
-
-           # Show current score after this turn
-            '''p1_score = end_round(self.p1.hand)
-            p2_score = end_round(self.p2.hand)
-            print(f"\nCurrent Scores:")
-            print(f"{self.p1.name}: {p1_score}")
-            print(f"{self.p2.name}: {p2_score}")'''
-            
+                       
             # Check end conditions
             end_game = False
             reason = ""
@@ -135,7 +128,7 @@ class KingsGame:
             turn_index += 1
             
 
-"""Edit by Michael"""
+""" Edit by Michael 12.06.2025 """
 class Player:
     """Base class for a King's Corner player.
     
@@ -158,6 +151,18 @@ class Player:
         self.score = 0
     
     def turn(self, state):
+        """
+        Execute a player's turn.
+        
+        Args:
+            state (dict): Current game state containing piles and draw pile.
+            
+        Returns:
+            str: Action taken by the player ('draw', 'end', 'played_card', 'moved_pile', etc.)
+            
+        Raises:
+            NotImplementedError: Must be implemented by subclass.
+        """
         raise NotImplementedError
     
     def draw_card(self, draw_pile):
@@ -214,7 +219,16 @@ class HumanPlayer(Player):
         super().__init__(name)
         
     def turn(self, state):
+        """
+        Execute a human player's turn with user input.
         
+        Args:
+            state (dict): Current game state containing piles and draw pile.
+            
+        Returns:
+            str or tuple: Action taken ('draw', 'end') or result tuple ('played_card', card) 
+                         or ('moved_pile', destination).
+        """
         print(f"\n=== {self.name}'s Turn ===")
         print(f"\nYour hand: {self.hand}")
         #print(f"Current board state: {state}")
@@ -245,6 +259,19 @@ class HumanPlayer(Player):
             return "end"
     
     def play_card(self, state):
+        """
+        Play a card from hand to a pile.
+        
+        Args:
+            state (dict): Current game state containing piles and draw pile.
+            
+        Returns:
+            str or tuple: 'invalid', 'no_play', or ('played_card', card_to_play).
+            
+        Side effects:
+            Prompts user for card index and destination.
+            Prints results to Terminal.
+        """
         if not self.hand:
             print("No cards in hand to play!")
             return "no_play"
@@ -278,6 +305,19 @@ class HumanPlayer(Player):
             return "invalid"
         
     def move_pile( self, state):
+        """
+        Move a pile from one location to another.
+        
+        Args:
+            state (dict): Current game state containing piles and draw pile.
+            
+        Returns:
+            str or tuple: 'invalid' or ('moved_pile', move_to).
+            
+        Side effects:
+            Prompts user for source and destination piles.
+            Prints results to terminal.
+        """
         piles = state.get('piles', {})
         print("Available piles:", list(piles.keys()))
         try:
@@ -302,12 +342,39 @@ class HumanPlayer(Player):
         except (ValueError, KeyError):
             print("Invalid input!")
             return "invalid"
-        
+
+""" Edited By Michael 12.06.2025 """
 class ComputerPlayer(Player):
+    """Computer-controlled player with predefined strategy."""
     def __init__(self, name):
+        """
+        Initialize a computer player.
+        
+        Args:
+            name (str): The computer player's name.
+        """
         super().__init__(name)
-    
+        
     def turn(self, state):
+        """
+        Execute a computer player's turn with strategic decision-making.
+        
+        Strategy order:
+        1. Play a King to an empty corner pile
+        2. Play any card to side piles
+        3. Move a pile from one side to another
+        4. Draw a card if possible
+        5. End turn
+        
+        Args:
+            state (dict): Current game state containing piles and draw pile.
+            
+        Returns:
+            str: Action taken ('draw', 'end', 'played_card', 'moved_pile').
+            
+        Side effects:
+            Prints computer's actions and decisions to terminal.
+        """
         print(f"\n=== {self.name}'s Turn (Computer) ===")
         piles = state.get('piles', {})
         draw_pile = state.get('draw_pile', [])
@@ -326,7 +393,6 @@ class ComputerPlayer(Player):
         for card in self.hand:
             side_piles = ['N', 'S', 'E', 'W']
             for side in side_piles:
-                print(f"{self.name} tries to play {card} to {side}")
                 result = valid_moves(self.hand, card, piles, move_to=side)
                 if "Invalid" not in result:
                     print(result)
@@ -335,7 +401,6 @@ class ComputerPlayer(Player):
         for from_pile in ['N', 'S', 'E', 'W']:
             for to_pile in ['N', 'S', 'E', 'W']:
                 if from_pile != to_pile and piles.get(from_pile):
-                    print(f"{self.name} tries to move pile from {from_pile} to {to_pile}")
                     result = valid_moves(
                         self.hand,
                         None,
@@ -751,11 +816,12 @@ def win_condition(p1_score, p2_score):
     """
     Args: p1 and p2 score is the players final score
     """
-    if p1_score > p2_score:
-        print(f"player 2 wins! score:{p2_score}")
-    elif p2_score > p1_score:
+    if p1_score < p2_score:
         print(f"player 1 wins! score:{p1_score}")
+    elif p2_score > p1_score:
+        print(f"player 2 wins! score:{p2_score}")
     else:
+        print(f"It's a tie! Both players have score: {p1_score}")
         return None
 
 p1 = [(13, "r"), (10, "b"), (8, "r")]
