@@ -817,9 +817,9 @@ def win_condition(p1_score, p2_score):
     Args: p1 and p2 score is the players final score
     """
     if p1_score < p2_score:
-        print(f"player 1 wins! score:{p1_score}")
-    elif p2_score > p1_score:
-        print(f"player 2 wins! score:{p2_score}")
+        print(f"Player 1 wins! Score:{p1_score}")
+    elif p2_score < p1_score:
+        print(f"Player 2 wins! Score:{p2_score}")
     else:
         print(f"It's a tie! Both players have score: {p1_score}")
         return None
