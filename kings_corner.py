@@ -31,14 +31,26 @@ class KingsGame:
         self.deck = Deck()
         
         # Ask player name
-        player_name = input("Enter your name: ").strip()
-        if player_name == "":
-            player_name = "Player 1"
-
-        # Create players
-        self.p1 = HumanPlayer(player_name)
-        self.p2 = ComputerPlayer("Computer")
-
+        mode_selection = input('Do you want to play against "P2" or "CPU?" ').strip()
+        if(mode_selection == "P2".casefold()):
+            player_name = input("Enter Player 1 name: ").strip()
+            if player_name == "":
+                player_name = "Player 1"
+            player2_name = input("Enter Player 2 name: ").strip()
+            if player2_name == "":
+                player2_name = "Player 2"
+            # Create players
+            self.p1 = HumanPlayer(player_name)
+            self.p2 = HumanPlayer(player2_name)
+        elif(mode_selection == "CPU".casefold()):
+            player_name = input("Enter your name: ").strip()
+            if player_name == "":
+                player_name = "Player 1"
+             # Create players
+            self.p1 = HumanPlayer(player_name)
+            self.p2 = ComputerPlayer("Computer")
+        else:
+            raise ValueError('Invalid mode selection. Choose "P2" or "CPU".')
         # Deal hands
         self.p1.hand = self.deck.deal()
         self.p2.hand = self.deck.deal()
@@ -226,7 +238,7 @@ class HumanPlayer(Player):
             state (dict): Current game state containing piles and draw pile.
             
         Returns:
-            str or tuple: Action taken ('draw', 'end') or result tuple ('played_card', card) 
+            str or tuple: Action taken ('draw', 'sort', 'end') or result tuple ('played_card', card) 
                          or ('moved_pile', destination).
         """
         print(f"\n=== {self.name}'s Turn ===")
@@ -238,14 +250,15 @@ class HumanPlayer(Player):
             print("1. Play a card")
             print("2. Move a pile")
             print("3. Draw a card")
-            print("4. End turn")
+            print("4. Sort hand")
+            print("5. End turn")
             
             try:
-                choice = int(input("Choose an action (1-4): "))
-                if 1 <= choice <= 4:
+                choice = int(input("Choose an action (1-5): "))
+                if 1 <= choice <= 5:
                     break
                 else:
-                    print("Please enter a number between 1 and 4.")
+                    print("Please enter a number between 1 and 5.")
             except ValueError:
                 print("Please enter a valid number")
                 
@@ -255,6 +268,9 @@ class HumanPlayer(Player):
             return self.move_pile(state)
         elif choice == 3:
             return "draw"
+        elif choice == 4:
+            self.sort_hand()
+            return "sort"
         else:
             return "end"
     
@@ -342,6 +358,26 @@ class HumanPlayer(Player):
         except (ValueError, KeyError):
             print("Invalid input!")
             return "invalid"
+    
+    def sort_hand(self):
+        #Made by Attowla
+        """
+        Sort the player's hand by rank, Ace to King
+        
+        Args: None
+        
+        Side Effects: Sorts the hand of the player (self.hand)
+        """
+        
+       # Add an order to assist with sorting 
+        rank_order = {
+    "A": 1,
+    "2": 2, "3": 3, "4": 4, "5": 5,
+    "6": 6, "7": 7, "8": 8, "9": 9,
+    "10": 10,
+    "J": 11, "Q": 12, "K": 13
+    }
+        self.hand.sort(key=lambda card: rank_order[(card[0])])
 
 """ Edited By Michael 12.06.2025 """
 class ComputerPlayer(Player):
@@ -450,6 +486,10 @@ def player_turn(player_hand, play_piles, draw_pile, player):
             turn_completed = True
         else:
             print("Draw pile is empty!")
+    elif action == "sort":
+        print(f"{player.name} sorts their hand.")
+        player_turn(player_hand, play_piles, draw_pile, player)
+        turn_completed = True
     elif action == "end":
         print(f"{player.name} ends turn.")
         turn_completed = True
