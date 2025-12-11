@@ -771,6 +771,7 @@ p2_score = end_round(p2)
 
 """Edit by Attowla"""
 def build_board(piles):
+    # Attowla
     """
     Build a 3x3 board layout of King's Corner.
 
@@ -790,6 +791,9 @@ def build_board(piles):
 
         Returns:
             str: Formatted top card string or bullet symbol.
+            
+        Side effects:
+            top_card has the possibility to be altered at every turn.
         """
         pile = piles.get(pile_name, [])
         if pile:
