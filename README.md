@@ -4,14 +4,14 @@
 ## Purpose of Each File
 * ### `demo_game.py` and `demo_human.py`
 
-    These are demo files used to illustrate how the game would look and behave during the presentation. They allow us to simulate gameplay and demonstrate player actions, but they are *`not required to run the final program`*. At the time of the presentation, the main game code was not fully complete, so these files helped showcase the gameplay flow.
+    These are demo files used to illustrate how the game would look and behave during the presentation. They allow us to simulate gameplay and demonstrate player actions, but they are **`not required to run the final program`**. At the time of the presentation, the main game code was not fully complete, so these files helped showcase the gameplay flow.
 
 * ### `kings_corner.py`
 
     This is the actual implementation of the King’s Corner game. It contains all the necessary classes, functions, and methods to run the game fully, including deck setup, game modes, player turns, move validation, hand management, board display, scoring, and win condition. This is the file used to run the program in its complete form.
 
 ## How to Run the Program:
-### `python3 kings_corner.py`
+**`python3 kings_corner.py`**
 
 ## How to Use the Program / Interpret Output
 * The program will prompt you to select a mode:
@@ -20,18 +20,18 @@
 * The program will then prompt you to enter your name.
 * Follow the on-screen prompts to play the game:
     * You will be asked to choose an action (1-5):
-        <pre>1. **Play a card**
+        1.**Play a card** 
             - Select a card from your hand by its index (0-based). 
             - Then choose which pile to place it on using the pile names (`N`, `S`, `E`, `W`, `NW`, `NE`, `SW`, `SE`).
-        2. **Move a pile**  
+        2.**Move a pile**  
             - Choose a source pile and a destination pile by name.  
             - The program will attempt to move the stack according to the game rules.
-        3. **Draw a card**  
+        3.**Draw a card**  
             - The program will draw a card for you automatically.
             **NOTE**: A card will also be drawn automatically if you attempt an invalid move.
-        4. **Sort hand**
+        4.**Sort hand**
             - The program will sort the cards in player's hand in ascending order based on rank.
-        5. **End turn**  
+        5.**End turn**  
             - The turn passes to the next player (the computer, in this case).
     * Computer player actions are automated and displayed for reference.
 * The game ends when:
