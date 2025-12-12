@@ -1,48 +1,57 @@
+""" Kings Corner Game """
+
 import random 
 
 """ Edit by Phakjira (Dec.10, 2025) """
 
 class KingsGame:
-    ''' 
+    """ 
     Manage and run a full game of King's Corner.
     
     Attributes:
         deck (Deck): The deck of cards used for the game.
-        p1 (HumanPlayer): The human player.
-        p2 (ComputerPlayer): The computer-controlled player.
+        p1 (HumanPlayer): Player 1 object.
+        p2 (HumanPlayer or ComputerPlayer): Player 2 object.
         foundation_cards (dict): The initial four face-up piles (N, S, E, W).
         piles (dict): Dictionary mapping pile names to lists of cards.
         draw_pile (list): Remaining undealt cards after setup.
-
-    Side effects:
-        Prompts the user for their name.
-        Modifies the deck by dealing cards and removing foundation cards.
-        Prints game information during setup.
-    '''
+    """
     def __init__(self):
-        '''
+        """
         Initialize a new King's Corner game.
         
         Side effects:
-            Prompts the user to enter their name via input().
+            Set instance attributes for deck, p1, p2, foundation_cards,
+                piles, draw_pile.
+            Prompts the user to select a mode (P2 or CPU).
+            Prompts the user to enter their name.
             Modifies the deck by dealing cards and removing foundation cards.
-        '''
+            
+        Raises:
+            ValueError: If the user enters a mode other than "P2" or "CPU".
+        """
         # Create deck
         self.deck = Deck()
         
-        # Ask player name
-        mode_selection = input('Do you want to play against "P2" or "CPU?" ').strip()
+        # Ask for mode
+        mode_selection = input('Do you want to play against "P2" ' + 
+                               'or "CPU?" ').strip()
+        # P2 mode
         if(mode_selection == "P2".casefold()):
+            # Ask player 1 name
             player_name = input("Enter Player 1 name: ").strip()
             if player_name == "":
                 player_name = "Player 1"
+            # Ask player 2 name
             player2_name = input("Enter Player 2 name: ").strip()
             if player2_name == "":
                 player2_name = "Player 2"
             # Create players
             self.p1 = HumanPlayer(player_name)
             self.p2 = HumanPlayer(player2_name)
+        # CPU mode
         elif(mode_selection == "CPU".casefold()):
+            # Ask player 1 name
             player_name = input("Enter your name: ").strip()
             if player_name == "":
                 player_name = "Player 1"
@@ -51,6 +60,7 @@ class KingsGame:
             self.p2 = ComputerPlayer("Computer")
         else:
             raise ValueError('Invalid mode selection. Choose "P2" or "CPU".')
+        
         # Deal hands
         self.p1.hand = self.deck.deal()
         self.p2.hand = self.deck.deal()
@@ -69,7 +79,7 @@ class KingsGame:
         self.draw_pile = self.deck.cards
         
     def play_game(self):
-        '''
+        """
         Run the main gameplay loop for King's Corner.
         
         Game ends when:
@@ -84,7 +94,7 @@ class KingsGame:
             Calls player_turn(), which may modify hands and piles.
             Mutates self.piles, self.draw_pile, and player hands.
             Prints final results.
-        '''
+        """
         print("\n=== Starting King’s Corner ===\n")
 
         players = [self.p1, self.p2]
@@ -138,8 +148,8 @@ class KingsGame:
 
             turn_index += 1
             
-
 """ Edit by Michael 12.06.2025 """
+
 class Player:
     """Base class for a King's Corner player.
     
@@ -169,7 +179,8 @@ class Player:
             state (dict): Current game state containing piles and draw pile.
             
         Returns:
-            str: Action taken by the player ('draw', 'end', 'played_card', 'moved_pile', etc.)
+            str: Action taken by the player ('draw', 'end', 'played_card', 
+                'moved_pile', etc.)
             
         Raises:
             NotImplementedError: Must be implemented by subclass.
@@ -183,7 +194,8 @@ class Player:
             draw_pile (list): List of cards representing the draw pile.
             
         Returns:
-            bool: True if card was drawn successfully, False if draw pile is empty.
+            bool: True if card was drawn successfully, 
+                False if draw pile is empty.
             
         Side effects:
             Adds a card to player's hand and removes it from draw pile.
@@ -216,6 +228,7 @@ class Player:
         return f"{self.name}: {len(self.hand)} cards, Score: {self.score}"    
 
 """ Edit by Michael 12.06.2025 """
+
 class HumanPlayer(Player):
     """Human player controlled by user input."""
     
@@ -238,8 +251,8 @@ class HumanPlayer(Player):
             state (dict): Current game state containing piles and draw pile.
             
         Returns:
-            str or tuple: Action taken ('draw', 'sort', 'end') or result tuple ('played_card', card) 
-                         or ('moved_pile', destination).
+            str or tuple: Action taken ('draw', 'sort', 'end') or result tuple 
+                ('played_card', card) or ('moved_pile', destination).
         """
         print(f"\n=== {self.name}'s Turn ===")
         print(f"\nYour hand: {self.hand}")
@@ -282,7 +295,8 @@ class HumanPlayer(Player):
             state (dict): Current game state containing piles and draw pile.
             
         Returns:
-            str or tuple: 'invalid', 'no_play', or ('played_card', card_to_play).
+            str or tuple: 'invalid', 'no_play', or ('played_card', 
+                card_to_play).
             
         Side effects:
             Prompts user for card index and destination.
@@ -301,7 +315,8 @@ class HumanPlayer(Player):
                 print("Invalid card index!")
                 return "invalid"
             
-            move_to = input("Enter destination pile (e.g., 'N', 'NE'): ").upper()
+            move_to = input("Enter destination pile " +
+                            "(e.g., 'N', 'NE'): ").upper()
             
             result = valid_moves(
                 self.hand,
@@ -359,6 +374,8 @@ class HumanPlayer(Player):
             print("Invalid input!")
             return "invalid"
     
+    """ Edit by Attowla """ 
+    
     def sort_hand(self):
         #Made by Attowla
         """
@@ -378,8 +395,9 @@ class HumanPlayer(Player):
     "J": 11, "Q": 12, "K": 13
     }
         self.hand.sort(key=lambda card: rank_order[(card[0])])
-
+        
 """ Edited By Michael 12.06.2025 """
+
 class ComputerPlayer(Player):
     """Computer-controlled player with predefined strategy."""
     def __init__(self, name):
@@ -421,7 +439,8 @@ class ComputerPlayer(Player):
                 for corner in corner_piles:
                     if not piles.get(corner, []):
                         print(f"{self.name} tries to play {card} to {corner}")
-                        result = valid_moves(self.hand, card, piles, move_to = corner)
+                        result = valid_moves(self.hand, card, piles, 
+                                             move_to = corner)
                         if "Invalid" not in result:
                             print(result)
                             return "played_card"
@@ -456,13 +475,15 @@ class ComputerPlayer(Player):
         return "end"
 
 """ Edit by Michael 12.06.2025 """
+
 def player_turn(player_hand, play_piles, draw_pile, player):
     """
     Process a complete turn for a player in King's Corner.
     
     Args:
         player_hand: List of cards in player's hand
-        play_piles: Dictionary of play piles {'N', 'S', 'E', 'W', 'NW', 'NE', 'SW', 'SE'}
+        play_piles: Dictionary of play piles {'N', 'S', 'E', 'W', 'NW', 'NE', 
+            'SW', 'SE'}
         draw_pile: List representing the draw pile
         player: Player object taking the turn (HumanPlayer or ComputerPlayer)
     
@@ -515,11 +536,11 @@ def player_turn(player_hand, play_piles, draw_pile, player):
 """Edit by Phakjira"""
 
 def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
-    '''Check whether the player's move is valid according to King's Corner 
+    """Check whether the player's move is valid according to King's Corner 
     rules.
     
         - If valid: the game state is updated (pile changed, card removed 
-                from hand)
+            from hand)
         - If invalid: move rejected, no state change.
     
     Args:
@@ -528,7 +549,7 @@ def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
         card_to_play (tuple or None): card that player wants to play. 
             (rank, color).
         piles (dict): all foundation and corner piles. Each key is a pile name 
-        (e.g., 'N', 'S') and each value is a list of cards in that pile.
+            (e.g., 'N', 'S') and each value is a list of cards in that pile.
         move_from (str, optional): name of the pile the player wants to move 
             a card or a stack from. Defaults to None.
         move_to (str): name of the pile the player wants to move 
@@ -538,10 +559,10 @@ def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
         str : a message indicating whether the move is valid or invalid.
         
     Side effects:
-        - Print updates to the console.
-        - Modifies the 'hand' list when a card is successfully play.
-        _ Modifies the 'piles' dictionary when a card or stack is moved.
-    '''
+        Print updates to the console.
+        Modifies the 'hand' list when a card is successfully play.
+        Modifies the 'piles' dictionary when a card or stack is moved.
+    """
     # Rank order from high to low
     rank_order = ['K', 'Q', 'J', '10', '9', '8', '7', '6', 
                   '5', '4', '3', '2', 'A']
@@ -717,7 +738,7 @@ def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
             
 
 # Fake data for testing
-hand = [
+'''hand = [
     ('A', 'R'), (2, 'R'), ('K', 'B'), 
     (2, 'B'), (3, 'B'), ('J', 'R'), 
     ('Q', 'B')
@@ -734,7 +755,7 @@ piles = {
     'SW' : []
 }            
 
-'''print(valid_moves(hand, (4, 'R'), piles))
+print(valid_moves(hand, (4, 'R'), piles))
 print(valid_moves(hand, (4, 'R'), piles, move_to = 'N'))
 print(valid_moves(hand, (2, 'B'), piles, move_to = 'S'))
 print(valid_moves(hand, ('A', 'R'), piles, move_to = 'B'))
@@ -748,7 +769,7 @@ print(valid_moves(hand, None, piles, move_from = 'E', move_to = 'T'))'''
 """ Edit by Phakjira (Dec.6, 2025) """
 
 class Deck:
-    ''' A deck of 52 cards used in the Kings Corner game.
+    """ A deck of 52 cards used in the Kings Corner game.
     
     Cards are represented as (rank, color) tuples. Each rank appears four times: 
     twice in Red and twice in Black. 
@@ -756,17 +777,17 @@ class Deck:
     Attributes:
         cards (list of tuple): the current ordered list of cards in the deck. 
             Each card is a (rank, color) tuple such as ('Q', 'Red').
-    '''
+    """
     
     RANKS = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]
     COLORS = ["Red", "Black"]  
 
     def __init__(self):
-        '''Initialize a shuffled deck.
+        """Initialize a shuffled deck.
         
         Side effects:
             Creates and populates the attribute 'cards'.
-        '''
+        """
         # Create 4 cards per rank: 2 Red + 2 Black
         self.cards = []
         for rank in self.RANKS:
@@ -778,41 +799,41 @@ class Deck:
         random.shuffle(self.cards)
 
     def deal(self):
-        '''Deal 7 cards from top of deck to the player. 
+        """Deal 7 cards from top of deck to the player. 
         
         Returns: 
             list of tuples: the list of those 7 cards.
         
         Side effects:
             Removes 7 cards from the beginning of 'self.cards'.
-        '''
+        """
         hand = self.cards[:7]
         self.cards = self.cards[7:]
         return hand
     
     def draw_one(self):
-        '''Draw 1 card from the deck. 
+        """Draw 1 card from the deck. 
         
         Returns:
             tuple: the top card of the deck. Ex. ('K', 'Black').
             
         Side effects:
             Removes 1 card from the beginning of 'self.cards'.
-        '''
+        """
         return self.cards.pop(0)
     
     def turn_up_four(self):
-        '''Draw 4 cards from the deck and place them in a cross (N, S, E, W).
+        """Draw 4 cards from the deck and place them in a cross (N, S, E, W).
         
             - Note: These are the foundation piles.
         
         Returns:
             foundation (dict): a dictionary with keys 'N', 'S', 'E', 'W' and 
-            their drawn cards.
+                their drawn cards.
             
         Side effects:
             Removes 4 cards from the beginning of 'self.cards'.
-        '''
+        """
         foundations = {
         "N": self.draw_one(),  # Returns card directly, not in list
         "S": self.draw_one(),
@@ -823,11 +844,11 @@ class Deck:
     
 
     def __len__(self):
-        '''Return the number of cards currently in the deck.'''
+        """Return the number of cards currently in the deck."""
         return len(self.cards)
     
     def __str__(self):
-        '''Return an informal string of cards (Human-readable formate).'''
+        """Return an informal string of cards (Human-readable formate)."""
         return str(self.cards)
 # Testing
 '''deck = Deck()
@@ -865,11 +886,11 @@ def win_condition(p1_score, p2_score):
         print(f"It's a tie! Both players have score: {p1_score}")
         return None
 
-p1 = [(13, "r"), (10, "b"), (8, "r")]
+'''p1 = [(13, "r"), (10, "b"), (8, "r")]
 p2 = [(9, "b"), (12, "b"), (3, "r")]
 
 p1_score = end_round(p1)
-p2_score = end_round(p2)
+p2_score = end_round(p2)'''
 
 #print(f"p1 score:{p1_score}")
 #print(f"p2 score:{p2_score}")
@@ -877,6 +898,7 @@ p2_score = end_round(p2)
 #win_condition(p1_score, p2_score) #no winner since only one round was played
 
 """Edit by Attowla"""
+
 def build_board(piles):
     # Attowla
     """
@@ -897,17 +919,14 @@ def build_board(piles):
             pile_name (str): Name of the specific pile.
 
         Returns:
-            str: Formatted top card string or bullet symbol.
+            str: Formatted top card string (e.g., 'KR' )or bullet symbol.
             
         Side effects:
             top_card has the possibility to be altered at every turn.
         """
         pile = piles.get(pile_name, [])
-        if pile:
-            rank, color = pile[-1]
-            return f"{rank}{color[0]}"  # Example: 'KR' = King Red
-        else:
-            return "\u2022"  # Bullet for empty pile
+        # Example: 'KR' = King Red  else  Bullet for empty pile
+        return f"{pile[-1][0]}{pile[-1][1][0]}" if pile else "\u2022"
 
     board = [
         [top_card('NW'), top_card('N'), top_card('NE')],
@@ -915,6 +934,8 @@ def build_board(piles):
         [top_card('SW'), top_card('S'), top_card('SE')]
     ]
     return board
+
+""" Edit by Phakjira """
 
 # main()
 def main():
