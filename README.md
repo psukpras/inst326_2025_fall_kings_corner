@@ -24,14 +24,18 @@
         1.**Play a card** 
             - Select a card from your hand by its index (0-based). 
             - Then choose which pile to place it on using the pile names (`N`, `S`, `E`, `W`, `NW`, `NE`, `SW`, `SE`).
+
         2.**Move a pile**  
             - Choose a source pile and a destination pile by name.  
             - The program will attempt to move the stack according to the game rules.
+
         3.**Draw a card**  
             - The program will draw a card for you automatically.
             **NOTE**: A card will also be drawn automatically if you attempt an invalid move.
+
         4.**Sort hand**
             - The program will sort the cards in player's hand in ascending order based on rank.
+
         5.**End turn**  
             - The turn passes to the next player (the computer, in this case).
 
