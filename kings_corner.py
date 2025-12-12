@@ -2,7 +2,11 @@
 
 import random 
 
-""" Edit by Phakjira (Dec.10, 2025) """
+""" Edit by Phakjira (Dec.10, 2025) 
+
+- Composition of two custom classes
+
+"""
 
 class KingsGame:
     """ 
@@ -148,7 +152,11 @@ class KingsGame:
 
             turn_index += 1
             
-""" Edit by Michael 12.06.2025 """
+""" Edit by Michael 12.06.2025
+
+- Magic methods other than .__init__
+
+"""
 
 class Player:
     """Base class for a King's Corner player.
@@ -227,7 +235,11 @@ class Player:
         """
         return f"{self.name}: {len(self.hand)} cards, Score: {self.score}"    
 
-""" Edit by Michael 12.06.2025 """
+""" Edit by Michael 12.06.2025
+
+- super()
+
+"""
 
 class HumanPlayer(Player):
     """Human player controlled by user input."""
@@ -374,7 +386,11 @@ class HumanPlayer(Player):
             print("Invalid input!")
             return "invalid"
     
-    """ Edit by Attowla """ 
+    """ Edit by Attowla 
+    
+    - Use of a key function with list.sort()
+    
+    """ 
     
     def sort_hand(self):
         #Made by Attowla
@@ -533,7 +549,11 @@ def player_turn(player_hand, play_piles, draw_pile, player):
     
     return player_hand, play_piles, draw_pile, turn_completed
 
-"""Edit by Phakjira"""
+"""Edit by Phakjira
+
+- Optional parameters / keyword arguments
+
+"""
 
 def valid_moves(hand, card_to_play, piles, move_from = None, move_to = None):
     """Check whether the player's move is valid according to King's Corner 
@@ -859,7 +879,12 @@ print(f"\nFoundation cards:\n\n {deck.turn_up_four()}")
 print(f"\nCards left in deck: {len(deck)}\n")'''
 
 
-"""Edit by Charlie"""
+"""Edit by Charlie
+
+- Sequence unpacking
+- f-strings containing expressions
+
+"""
 
 def end_round(playerturnhand):
     """
@@ -897,7 +922,11 @@ p2_score = end_round(p2)'''
 
 #win_condition(p1_score, p2_score) #no winner since only one round was played
 
-"""Edit by Attowla"""
+"""Edit by Attowla
+
+- Conditional expression
+
+"""
 
 def build_board(piles):
     # Attowla
